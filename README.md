@@ -1,4 +1,4 @@
 # 🔒 Passbolt Autoupdate Script
-Simple script written in bash for updating passbolt.
+A simple bash script for updating passbolt.
 
-It uses base commands found in the official pages of passbolt like Healthcheck and Cake.
+This script utilizes base commands from the official Passbolt documentation, including Healthcheck and Cake.
