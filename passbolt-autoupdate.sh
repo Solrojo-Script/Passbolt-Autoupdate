@@ -1,25 +1,35 @@
 #!/bin/bash
 
-# Script développé par Gabriel GAITAN en 2025
-#
-# Pas de Copyright, ce script est libre et gratuit :)
+# #######################################################################################
+# # /* ---- 🐧 https://github.com/Solrojo-Script 🐧 ---- */  #
+# #######################################################################################
 #
 # Ce script a pour but la mise à jour automatique de passbolt
-# Ce script est purement compatible avec bash shell
-#
+# 
 # Notes : Lorsque vous voyez 2>&1, 2 est le descripteur de fichier 2 (erreur standard par défaut)
 # >& est un opérateur de redirection qui redirige vers un descripteur de fichier, 
 # qui est dans ce cas 1 (sortie standard par défaut ). 
 
-
-#Setup Colors
-purple=$(tput setaf 171)
-red=$(tput setaf 1)
-green=$(tput setaf 2)
-cyan=$(tput setaf 6)
-tan=$(tput setaf 3)
-bold=$(tput bold)
-reset=$(tput sgr0)
+# Si le script est exécuté par cron, alors les couleurs sont supprimées
+if [ -z "$TERM" ]; 
+then
+  purple=""
+  red=""
+  green=""
+  cyan=""
+  tan=""
+  bold=""
+  reset=""
+else
+	#Setup Colors
+	purple=$(tput setaf 171)
+	red=$(tput setaf 1)
+	green=$(tput setaf 2)
+	cyan=$(tput setaf 6)
+	tan=$(tput setaf 3)
+	bold=$(tput bold)
+	reset=$(tput sgr0)
+fi
 
 #Setup Headers
 e_header() { printf "\n${bold}${purple}==========  %s  ==========${reset}\n" "$@";}
@@ -147,13 +157,11 @@ healthcheck() {
 	
 	sleep 2
 	
-	while IFS= read -r line 
+	while IFS= read -r line; 
 	    do
-			if [ "$line" == *"This installation is not up to date."* ]
-			then
+			if [[ "$line" == *"This installation is not up to date."* ]];then
 				need_for_update=true
-			
-			elif [ "$line" == *"FAIL"* ] && [ "$need_for_update" == false ]
+			elif [[ "$line" == *"FAIL"* ]] && [[ "$need_for_update" == false ]]
 			then
 	 			e_warning "Erreur détecté : $line"
 
@@ -161,17 +169,17 @@ healthcheck() {
 
 	 			sleep 1
    				
-   				if [ "$line" == *"GPG"* ]
+   				if [[ "$line" == *"GPG"* ]]
     			then
     				e_error "Problème avec le GPG"
     				#corriger_gpg
     
-    			elif [ "$line" == *"Database"* ]
+    			elif [[ "$line" == *"Database"* ]]
     			then
         			e_error "Problème avec la base de données"
         			#verifier_db
     
-    			elif [ "$line" == *"Cron"* ]
+    			elif [[ "$line" == *"Cron"* ]]
     			then
         			e_error "Problème avec cron"
         			#relancer_cron
@@ -181,12 +189,12 @@ healthcheck() {
 
     			# Sauvegarde la sortie des messages dans le fichier log
     			{
-    				echo "====== [$(date '+%Y-%m-%d %H:%M:%S')] Healthcheck ======"
+    				echo "====== [ $(date '+%Y-%m-%d %H:%M:%S' ) ] Healthcheck ======"
     				echo "$output_health"
     				echo
 				} >> /var/log/passbolt/autoupdate.log
 
-   		 	elif [ "$line" == *"WARNING"* ]
+   		 	elif [[ "$line" == *"WARNING"* ]]
     		then
     			warning=true
 
@@ -194,14 +202,14 @@ healthcheck() {
 
         		# Sauvegarde la sortie des messages dans le fichier log
     			{
-    				echo "====== [$(date '+%Y-%m-%d %H:%M:%S')] Healthcheck ======"
+    				echo "====== [ $(date '+%Y-%m-%d %H:%M:%S') ] Healthcheck ======"
     				echo "$output_health"
     				echo
 				} >> /var/log/passbolt/autoupdate.log
 
     		fi
 
-	done <<< "$output_health" # Alimenta el bucle while con el output del comando healthcheck
+	done <<< "$output_health" # Alimente la boucle while avec la sortie de la commande healthcheck
 	
 	if [ "$warning" == true ] || [ "$critical_error" == true ]
 	then
